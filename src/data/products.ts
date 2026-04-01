@@ -1,3 +1,6 @@
+import productBedsheet from '@/assets/product-bedsheet-1.jpg';
+import productJewelry from '@/assets/product-jewelry-1.jpg';
+
 export interface Product {
   id: string;
   name: string;
