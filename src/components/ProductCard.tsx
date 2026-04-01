@@ -27,16 +27,14 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
     >
       {/* Image */}
       <Link to={`/product/${product.id}`} className="block relative aspect-[4/5] bg-secondary overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center p-4">
-            <div className="w-20 h-20 mx-auto mb-2 rounded-full bg-gold/10 flex items-center justify-center">
-              <span className="text-2xl">
-                {product.category === 'bedsheet' ? '🛏️' : '💎'}
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground font-body">{product.material || product.subcategory}</p>
-          </div>
-        </div>
+        <img
+          src={product.category === 'bedsheet' ? bedsheetImg : jewelryImg}
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          loading="lazy"
+          width={800}
+          height={1000}
+        />
 
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
