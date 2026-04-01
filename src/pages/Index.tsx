@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Star, Truck, Shield, Repeat, Heart } from 'lucide-react';
+import heroImage from '@/assets/hero-bedsheets.jpg';
 import ProductCard from '@/components/ProductCard';
 import { bedsheets, jewelry, testimonials } from '@/data/products';
 
