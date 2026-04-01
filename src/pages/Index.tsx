@@ -21,12 +21,14 @@ const Index = () => {
   return (
     <div>
       {/* Hero */}
-      <section className="relative min-h-[85vh] flex items-center bg-gradient-to-br from-secondary via-background to-blush overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute top-20 right-20 w-64 h-64 bg-gold/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-10 w-48 h-48 bg-primary/5 rounded-full blur-2xl" />
+      <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+        {/* Background image */}
+        <div className="absolute inset-0">
+          <img src={heroImage} alt="Rangoli Creations - Premium bedsheets and jewelry" className="w-full h-full object-cover" width={1920} height={1080} />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-transparent" />
+        </div>
 
-        <div className="container mx-auto px-4 lg:px-8 py-20">
+        <div className="container mx-auto px-4 lg:px-8 py-20 relative z-10">
           <div className="max-w-2xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
