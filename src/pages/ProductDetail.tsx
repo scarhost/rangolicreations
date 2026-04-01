@@ -5,6 +5,9 @@ import { ShoppingBag, Minus, Plus, Star, Truck, RotateCcw, Shield, ArrowLeft } f
 import { getProductById, allProducts } from '@/data/products';
 import { useCart } from '@/context/CartContext';
 import ProductCard from '@/components/ProductCard';
+import bedsheetImg from '@/assets/product-bedsheet-1.jpg';
+import jewelryImg from '@/assets/product-jewelry-1.jpg';
+import ProductCard from '@/components/ProductCard';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
