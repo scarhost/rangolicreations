@@ -6,7 +6,6 @@ import type { Product } from '@/data/products';
 import { useCart } from '@/context/CartContext';
 import bedsheetImg from '@/assets/product-bedsheet-1.jpg';
 import jewelryImg from '@/assets/product-jewelry-1.jpg';
-import { useCart } from '@/context/CartContext';
 
 const ProductCard = ({ product, index = 0 }: { product: Product; index?: number }) => {
   const { addToCart } = useCart();
