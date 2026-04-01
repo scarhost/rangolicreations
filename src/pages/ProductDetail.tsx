@@ -50,14 +50,16 @@ const ProductDetail = () => {
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="aspect-square bg-secondary rounded-2xl flex items-center justify-center"
+            className="aspect-square bg-secondary rounded-2xl overflow-hidden"
           >
-            <div className="text-center">
-              <div className="w-32 h-32 mx-auto rounded-full bg-gold/10 flex items-center justify-center mb-4">
-                <span className="text-5xl">{product.category === 'bedsheet' ? '🛏️' : '💎'}</span>
-              </div>
-              <p className="text-sm text-muted-foreground font-body">{product.name}</p>
-            </div>
+            <img
+              src={product.category === 'bedsheet' ? bedsheetImg : jewelryImg}
+              alt={product.name}
+              className="w-full h-full object-cover"
+              width={800}
+              height={800}
+            />
+          </motion.div>
           </motion.div>
 
           {/* Details */}
