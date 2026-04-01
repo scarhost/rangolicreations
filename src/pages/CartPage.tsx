@@ -46,8 +46,8 @@ const CartPage = () => {
                 exit={{ opacity: 0 }}
                 className="flex gap-4 p-4 bg-card border border-border rounded-xl"
               >
-                <div className="w-20 h-20 bg-secondary rounded-lg flex items-center justify-center shrink-0">
-                  <span className="text-2xl">{item.product.category === 'bedsheet' ? '🛏️' : '💎'}</span>
+                <div className="w-20 h-20 bg-secondary rounded-lg overflow-hidden shrink-0">
+                  <img src={item.product.category === 'bedsheet' ? bedsheetImg : jewelryImg} alt={item.product.name} className="w-full h-full object-cover" loading="lazy" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
