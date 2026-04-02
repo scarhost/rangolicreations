@@ -1,39 +1,68 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ArrowLeft, Check, CreditCard, Truck, Tag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { createOrder } from '@/hooks/useOrders';
 
 const CheckoutPage = () => {
   const { items, totalPrice, clearCart } = useCart();
   const [step, setStep] = useState<'checkout' | 'confirmed'>('checkout');
   const [coupon, setCoupon] = useState('');
+  const [orderNumber, setOrderNumber] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('Credit / Debit Card');
 
   const shipping = totalPrice >= 2999 ? 0 : 199;
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setStep('confirmed');
-    clearCart();
+    setSubmitting(true);
+    
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+
+    try {
+      const order = await createOrder({
+        firstName: fd.get('firstName') as string,
+        lastName: fd.get('lastName') as string,
+        email: fd.get('email') as string,
+        phone: fd.get('phone') as string,
+        addressLine1: fd.get('address1') as string,
+        addressLine2: fd.get('address2') as string,
+        city: fd.get('city') as string,
+        state: fd.get('state') as string,
+        pinCode: fd.get('pinCode') as string,
+        country: fd.get('country') as string || 'India',
+        paymentMethod,
+        couponCode: coupon,
+        items,
+        subtotal: totalPrice,
+        shipping,
+        total: totalPrice + shipping,
+      });
+
+      setOrderNumber(order.order_number);
+      setStep('confirmed');
+      clearCart();
+    } catch (err) {
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (step === 'confirmed') {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md text-center"
-        >
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="max-w-md text-center">
           <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gold/20 flex items-center justify-center">
             <Check size={36} className="text-gold-dark" />
           </div>
           <h1 className="font-heading text-3xl font-semibold text-foreground mb-3">Order Confirmed!</h1>
           <p className="text-sm text-muted-foreground font-body mb-2">Thank you for shopping with Rangoli Creations.</p>
-          <p className="text-xs text-muted-foreground font-body mb-8">Order #RC{Date.now().toString().slice(-6)} • A confirmation email has been sent.</p>
-          <Link to="/" className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-body text-sm font-medium hover:bg-maroon-light transition-colors">
-            Continue Shopping
-          </Link>
+          <p className="text-xs text-muted-foreground font-body mb-8">Order #{orderNumber} • A confirmation email has been sent.</p>
+          <Link to="/" className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-body text-sm font-medium hover:bg-maroon-light transition-colors">Continue Shopping</Link>
         </motion.div>
       </div>
     );
@@ -60,27 +89,25 @@ const CheckoutPage = () => {
         <form onSubmit={handlePlaceOrder}>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
-              {/* Shipping */}
               <div className="bg-card border border-border rounded-xl p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <Truck size={16} className="text-gold-dark" />
                   <h2 className="font-heading text-base font-semibold text-foreground">Shipping Address</h2>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <input required placeholder="First Name" className="bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
-                  <input required placeholder="Last Name" className="bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
-                  <input required placeholder="Email" type="email" className="sm:col-span-2 bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
-                  <input required placeholder="Phone" className="sm:col-span-2 bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
-                  <input required placeholder="Address Line 1" className="sm:col-span-2 bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
-                  <input placeholder="Address Line 2" className="sm:col-span-2 bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
-                  <input required placeholder="City" className="bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
-                  <input required placeholder="State" className="bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
-                  <input required placeholder="PIN Code" className="bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
-                  <input required placeholder="Country" defaultValue="India" className="bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+                  <input name="firstName" required placeholder="First Name" className="bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+                  <input name="lastName" required placeholder="Last Name" className="bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+                  <input name="email" required type="email" placeholder="Email" className="sm:col-span-2 bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+                  <input name="phone" required placeholder="Phone" className="sm:col-span-2 bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+                  <input name="address1" required placeholder="Address Line 1" className="sm:col-span-2 bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+                  <input name="address2" placeholder="Address Line 2" className="sm:col-span-2 bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+                  <input name="city" required placeholder="City" className="bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+                  <input name="state" required placeholder="State" className="bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+                  <input name="pinCode" required placeholder="PIN Code" className="bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+                  <input name="country" required placeholder="Country" defaultValue="India" className="bg-secondary border border-border rounded-lg px-3 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
                 </div>
               </div>
 
-              {/* Payment */}
               <div className="bg-card border border-border rounded-xl p-6">
                 <div className="flex items-center gap-2 mb-4">
                   <CreditCard size={16} className="text-gold-dark" />
@@ -89,7 +116,7 @@ const CheckoutPage = () => {
                 <div className="space-y-3">
                   {['Credit / Debit Card', 'UPI', 'Net Banking', 'Cash on Delivery'].map((method, i) => (
                     <label key={method} className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-secondary/50 cursor-pointer transition-colors">
-                      <input type="radio" name="payment" defaultChecked={i === 0} className="accent-primary" />
+                      <input type="radio" name="payment" checked={paymentMethod === method} onChange={() => setPaymentMethod(method)} className="accent-primary" />
                       <span className="text-sm font-body">{method}</span>
                     </label>
                   ))}
@@ -98,7 +125,6 @@ const CheckoutPage = () => {
               </div>
             </div>
 
-            {/* Order Summary */}
             <div className="bg-card border border-border rounded-xl p-6 h-fit sticky top-28">
               <h3 className="font-heading text-lg font-semibold text-foreground mb-4">Order Summary</h3>
               <div className="space-y-3 mb-4">
@@ -110,42 +136,22 @@ const CheckoutPage = () => {
                 ))}
               </div>
 
-              {/* Coupon */}
               <div className="flex gap-2 mb-4">
                 <div className="flex-1 flex items-center gap-2 bg-secondary border border-border rounded-lg px-3">
                   <Tag size={13} className="text-muted-foreground" />
-                  <input
-                    value={coupon}
-                    onChange={e => setCoupon(e.target.value)}
-                    placeholder="Coupon code"
-                    className="bg-transparent py-2 text-sm font-body outline-none w-full"
-                  />
+                  <input value={coupon} onChange={e => setCoupon(e.target.value)} placeholder="Coupon code" className="bg-transparent py-2 text-sm font-body outline-none w-full" />
                 </div>
-                <button type="button" className="bg-secondary border border-border text-sm font-body px-3 rounded-lg hover:bg-muted transition-colors">
-                  Apply
-                </button>
+                <button type="button" className="bg-secondary border border-border text-sm font-body px-3 rounded-lg hover:bg-muted transition-colors">Apply</button>
               </div>
 
               <div className="space-y-2 text-sm font-body border-t border-border pt-4">
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Subtotal</span>
-                  <span>₹{totalPrice.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Shipping</span>
-                  <span>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
-                </div>
-                <div className="flex justify-between text-foreground font-medium pt-2 border-t border-border">
-                  <span>Total</span>
-                  <span className="font-heading text-xl">₹{(totalPrice + shipping).toLocaleString()}</span>
-                </div>
+                <div className="flex justify-between text-muted-foreground"><span>Subtotal</span><span>₹{totalPrice.toLocaleString()}</span></div>
+                <div className="flex justify-between text-muted-foreground"><span>Shipping</span><span>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span></div>
+                <div className="flex justify-between text-foreground font-medium pt-2 border-t border-border"><span>Total</span><span className="font-heading text-xl">₹{(totalPrice + shipping).toLocaleString()}</span></div>
               </div>
 
-              <button
-                type="submit"
-                className="w-full mt-6 bg-primary text-primary-foreground py-3.5 rounded-lg font-body font-medium text-sm hover:bg-maroon-light transition-colors"
-              >
-                Place Order
+              <button type="submit" disabled={submitting} className="w-full mt-6 bg-primary text-primary-foreground py-3.5 rounded-lg font-body font-medium text-sm hover:bg-maroon-light transition-colors disabled:opacity-50">
+                {submitting ? 'Processing...' : 'Place Order'}
               </button>
             </div>
           </div>
