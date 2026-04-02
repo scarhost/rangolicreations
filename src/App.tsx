@@ -17,6 +17,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import NotFound from "./pages/NotFound";
+import AdminPage from "./pages/AdminPage";
 
 const queryClient = new QueryClient();
 
@@ -28,22 +29,29 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <RangoliTransition />
-          <Navbar />
-          <main>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/bedsheets" element={<BedsheetsShop />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/jewelry" element={<JewelryPage />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-          <Footer />
-          <ChatWidget />
+          <Routes>
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="*" element={
+              <>
+                <Navbar />
+                <main>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/bedsheets" element={<BedsheetsShop />} />
+                    <Route path="/product/:id" element={<ProductDetail />} />
+                    <Route path="/jewelry" element={<JewelryPage />} />
+                    <Route path="/cart" element={<CartPage />} />
+                    <Route path="/checkout" element={<CheckoutPage />} />
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </main>
+                <Footer />
+                <ChatWidget />
+              </>
+            } />
+          </Routes>
         </BrowserRouter>
       </CartProvider>
     </TooltipProvider>

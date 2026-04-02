@@ -24,8 +24,8 @@ const AdminTestimonials = () => {
         const { error } = await supabase.from('testimonials').update(item).eq('id', item.id);
         if (error) throw error;
       } else {
-        const { id, ...rest } = item;
-        const { error } = await supabase.from('testimonials').insert(rest);
+      const { id, ...rest } = item;
+        const { error } = await supabase.from('testimonials').insert([rest]);
         if (error) throw error;
       }
     },
