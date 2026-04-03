@@ -7,6 +7,7 @@ import jewelryImg from '@/assets/product-jewelry-1.jpg';
 
 const CartPage = () => {
   const { items, removeFromCart, updateQuantity, totalPrice } = useCart();
+  const { formatPrice, convertPrice, flatShippingFee, currencySymbol, currencyCode } = useCurrency();
 
   if (items.length === 0) {
     return (
