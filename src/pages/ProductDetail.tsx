@@ -15,6 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 const ProductDetail = () => {
   const { id: slug } = useParams<{ id: string }>();
   const { addToCart } = useCart();
+  const { formatPrice, flatShippingFee, currencySymbol, regionName } = useCurrency();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ['product-slug', slug],
