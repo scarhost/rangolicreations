@@ -66,6 +66,7 @@ const AdminPage = () => {
           {activeTab === 'content' && <AdminContent />}
           {activeTab === 'testimonials' && <AdminTestimonials />}
           {activeTab === 'orders' && <AdminOrders />}
+          {activeTab === 'shipping' && <AdminShipping />}
           {activeTab === 'chat' && <AdminChat />}
           {activeTab === 'contacts' && <AdminContacts />}
           {activeTab === 'newsletter' && <AdminNewsletter />}
