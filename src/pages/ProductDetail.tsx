@@ -162,7 +162,7 @@ const ProductDetail = () => {
               )}
               <div className="flex items-start gap-3">
                 <Truck size={16} className="text-gold-dark mt-0.5 shrink-0" />
-                <div><p className="text-xs font-body font-medium text-foreground">Delivery</p><p className="text-xs text-muted-foreground font-body">Free shipping on orders above ₹2,999. Estimated 5-7 business days.</p></div>
+                <div><p className="text-xs font-body font-medium text-foreground">Delivery to {regionName}</p><p className="text-xs text-muted-foreground font-body">{flatShippingFee === 0 ? 'Free shipping' : `Shipping: ${currencySymbol}${flatShippingFee}`}. Estimated 5-7 business days.</p></div>
               </div>
             </div>
           </motion.div>
