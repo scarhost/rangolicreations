@@ -86,15 +86,15 @@ const CartPage = () => {
             <div className="space-y-3 text-sm font-body">
               <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal</span>
-                <span>₹{totalPrice.toLocaleString()}</span>
+                <span>{formatPrice(totalPrice)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>Shipping</span>
-                <span>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
+                <span>{shipping === 0 ? 'FREE' : `${currencySymbol}${shipping}`}</span>
               </div>
               <div className="border-t border-border pt-3 flex justify-between text-foreground font-medium">
                 <span>Total</span>
-                <span className="font-heading text-lg">₹{(totalPrice + shipping).toLocaleString()}</span>
+                <span className="font-heading text-lg">{currencySymbol}{(convertedTotal + shipping).toLocaleString(undefined, { minimumFractionDigits: currencyCode === 'JPY' ? 0 : 2, maximumFractionDigits: 2 })}</span>
               </div>
             </div>
             <Link
