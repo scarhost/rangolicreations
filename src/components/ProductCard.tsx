@@ -4,11 +4,15 @@ import { ShoppingBag, Eye, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { Product } from '@/hooks/useProducts';
 import { useCart } from '@/context/CartContext';
+import { useCurrency } from '@/context/CurrencyContext';
+
 import bedsheetImg from '@/assets/product-bedsheet-1.jpg';
 import jewelryImg from '@/assets/product-jewelry-1.jpg';
 
 const ProductCard = ({ product, index = 0 }: { product: Product; index?: number }) => {
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
+
   const [isHovered, setIsHovered] = useState(false);
 
   const discount = product.original_price
@@ -83,9 +87,9 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="font-heading text-base font-semibold text-foreground">₹{product.price.toLocaleString()}</span>
+          <span className="font-heading text-base font-semibold text-foreground">{formatPrice(product.price)}</span>
           {product.original_price && (
-            <span className="text-xs text-muted-foreground line-through font-body">₹{product.original_price.toLocaleString()}</span>
+            <span className="text-xs text-muted-foreground line-through font-body">{formatPrice(product.original_price)}</span>
           )}
         </div>
 

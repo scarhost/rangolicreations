@@ -334,6 +334,45 @@ export type Database = {
         }
         Relationships: []
       }
+      shipping_zones: {
+        Row: {
+          countries: string[]
+          created_at: string
+          currency_code: string
+          flat_shipping_fee: number
+          id: string
+          is_active: boolean | null
+          markup_percentage: number
+          region_name: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          countries?: string[]
+          created_at?: string
+          currency_code?: string
+          flat_shipping_fee?: number
+          id?: string
+          is_active?: boolean | null
+          markup_percentage?: number
+          region_name: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          countries?: string[]
+          created_at?: string
+          currency_code?: string
+          flat_shipping_fee?: number
+          id?: string
+          is_active?: boolean | null
+          markup_percentage?: number
+          region_name?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_content: {
         Row: {
           created_at: string
