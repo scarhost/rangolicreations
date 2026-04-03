@@ -11,6 +11,8 @@ import jewelryImg from '@/assets/product-jewelry-1.jpg';
 
 const ProductCard = ({ product, index = 0 }: { product: Product; index?: number }) => {
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
+
   const [isHovered, setIsHovered] = useState(false);
 
   const discount = product.original_price
