@@ -8,12 +8,15 @@ import AdminOrders from '@/components/admin/AdminOrders';
 import AdminChat from '@/components/admin/AdminChat';
 import AdminContacts from '@/components/admin/AdminContacts';
 import AdminNewsletter from '@/components/admin/AdminNewsletter';
+import AdminShipping from '@/components/admin/AdminShipping';
+import { Globe } from 'lucide-react';
 
 const tabs = [
   { id: 'products', label: 'Products', icon: Package },
   { id: 'content', label: 'Site Content', icon: FileText },
   { id: 'testimonials', label: 'Testimonials', icon: Star },
   { id: 'orders', label: 'Orders', icon: ShoppingCart },
+  { id: 'shipping', label: 'Shipping & Pricing', icon: Globe },
   { id: 'chat', label: 'Chat', icon: MessageSquare },
   { id: 'contacts', label: 'Contact Messages', icon: Mail },
   { id: 'newsletter', label: 'Newsletter', icon: Newspaper },
