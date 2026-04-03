@@ -24,7 +24,8 @@ const CartPage = () => {
     );
   }
 
-  const shipping = totalPrice >= 2999 ? 0 : 199;
+  const convertedTotal = convertPrice(totalPrice);
+  const shipping = flatShippingFee;
 
   return (
     <div className="min-h-screen">
