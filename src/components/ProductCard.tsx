@@ -87,9 +87,9 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="font-heading text-base font-semibold text-foreground">₹{product.price.toLocaleString()}</span>
+          <span className="font-heading text-base font-semibold text-foreground">{formatPrice(product.price)}</span>
           {product.original_price && (
-            <span className="text-xs text-muted-foreground line-through font-body">₹{product.original_price.toLocaleString()}</span>
+            <span className="text-xs text-muted-foreground line-through font-body">{formatPrice(product.original_price)}</span>
           )}
         </div>
 

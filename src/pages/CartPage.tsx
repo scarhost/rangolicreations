@@ -103,9 +103,9 @@ const CartPage = () => {
             >
               Proceed to Checkout
             </Link>
-            {totalPrice < 2999 && (
+            {shipping > 0 && (
               <p className="text-[10px] text-muted-foreground font-body mt-3 text-center">
-                Add ₹{(2999 - totalPrice).toLocaleString()} more for free shipping
+                Shipping to your region: {currencySymbol}{shipping}
               </p>
             )}
           </div>
