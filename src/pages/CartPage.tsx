@@ -70,7 +70,7 @@ const CartPage = () => {
                         <Plus size={12} />
                       </button>
                     </div>
-                    <span className="font-heading text-sm font-semibold">₹{(item.product.price * item.quantity).toLocaleString()}</span>
+                    <span className="font-heading text-sm font-semibold">{formatPrice(item.product.price * item.quantity)}</span>
                   </div>
                 </div>
               </motion.div>
