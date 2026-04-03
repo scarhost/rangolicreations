@@ -4,6 +4,8 @@ import { ShoppingBag, Eye, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { Product } from '@/hooks/useProducts';
 import { useCart } from '@/context/CartContext';
+import { useCurrency } from '@/context/CurrencyContext';
+
 import bedsheetImg from '@/assets/product-bedsheet-1.jpg';
 import jewelryImg from '@/assets/product-jewelry-1.jpg';
 
