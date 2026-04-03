@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { ShoppingBag, Minus, Plus, Star, Truck, RotateCcw, Shield, ArrowLeft } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/context/CartContext';
+import { useCurrency } from '@/context/CurrencyContext';
+
 import ProductCard from '@/components/ProductCard';
 import RangoliSpinner from '@/components/RangoliSpinner';
 import bedsheetImg from '@/assets/product-bedsheet-1.jpg';
