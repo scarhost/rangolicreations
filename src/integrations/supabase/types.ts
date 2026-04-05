@@ -255,12 +255,14 @@ export type Database = {
       }
       products: {
         Row: {
+          benefit_points: string[] | null
           best_seller: boolean | null
           care_instructions: string | null
           category: string
           colors: string[] | null
           created_at: string
           description: string
+          favourite_variant: string | null
           featured: boolean | null
           id: string
           images: string[] | null
@@ -276,17 +278,22 @@ export type Database = {
           slug: string
           sort_order: number | null
           subcategory: string | null
+          subtitle: string | null
           tags: string[] | null
+          trust_signals: Json | null
           units: number | null
           updated_at: string
+          variant_prices: Json | null
         }
         Insert: {
+          benefit_points?: string[] | null
           best_seller?: boolean | null
           care_instructions?: string | null
           category: string
           colors?: string[] | null
           created_at?: string
           description?: string
+          favourite_variant?: string | null
           featured?: boolean | null
           id?: string
           images?: string[] | null
@@ -302,17 +309,22 @@ export type Database = {
           slug: string
           sort_order?: number | null
           subcategory?: string | null
+          subtitle?: string | null
           tags?: string[] | null
+          trust_signals?: Json | null
           units?: number | null
           updated_at?: string
+          variant_prices?: Json | null
         }
         Update: {
+          benefit_points?: string[] | null
           best_seller?: boolean | null
           care_instructions?: string | null
           category?: string
           colors?: string[] | null
           created_at?: string
           description?: string
+          favourite_variant?: string | null
           featured?: boolean | null
           id?: string
           images?: string[] | null
@@ -328,9 +340,12 @@ export type Database = {
           slug?: string
           sort_order?: number | null
           subcategory?: string | null
+          subtitle?: string | null
           tags?: string[] | null
+          trust_signals?: Json | null
           units?: number | null
           updated_at?: string
+          variant_prices?: Json | null
         }
         Relationships: []
       }
