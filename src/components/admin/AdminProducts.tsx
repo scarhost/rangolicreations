@@ -6,11 +6,12 @@ import type { Tables, TablesInsert } from '@/integrations/supabase/types';
 
 type Product = Tables<'products'>;
 
-const emptyProduct: Partial<TablesInsert<'products'>> = {
+const emptyProduct: Record<string, any> = {
   name: '', slug: '', price: 0, category: 'bedsheet', description: '',
   subcategory: '', material: '', care_instructions: '', rating: 0, reviews: 0,
   units: 0, featured: false, best_seller: false, new_arrival: false,
   images: ['/placeholder.svg'], sizes: [], colors: [], tags: [],
+  subtitle: '', trust_signals: [], benefit_points: [], variant_prices: {}, favourite_variant: '',
 };
 
 const AdminProducts = () => {
@@ -59,8 +60,16 @@ const AdminProducts = () => {
   });
 
   const startEdit = (product: Product) => {
+    const ext = product as any;
     setEditing(product.id);
-    setForm({ ...product });
+    setForm({
+      ...product,
+      subtitle: ext.subtitle || '',
+      trust_signals: ext.trust_signals || [],
+      benefit_points: ext.benefit_points || [],
+      variant_prices: ext.variant_prices || {},
+      favourite_variant: ext.favourite_variant || '',
+    });
     setCreating(false);
   };
 
@@ -79,9 +88,32 @@ const AdminProducts = () => {
     setForm({ ...form, [field]: value.split(',').map(s => s.trim()).filter(Boolean) });
   };
 
+  // Trust signals helpers
+  const handleTrustSignalChange = (idx: number, key: string, value: string) => {
+    const ts = [...(form.trust_signals || [])];
+    ts[idx] = { ...ts[idx], [key]: value };
+    setForm({ ...form, trust_signals: ts });
+  };
+  const addTrustSignal = () => {
+    setForm({ ...form, trust_signals: [...(form.trust_signals || []), { icon: 'Shield', text: '' }] });
+  };
+  const removeTrustSignal = (idx: number) => {
+    const ts = [...(form.trust_signals || [])];
+    ts.splice(idx, 1);
+    setForm({ ...form, trust_signals: ts });
+  };
+
+  // Variant prices helpers
+  const handleVariantPriceChange = (size: string, price: string) => {
+    const vp = { ...(form.variant_prices || {}) };
+    if (price === '') { delete vp[size]; } else { vp[size] = +price; }
+    setForm({ ...form, variant_prices: vp });
+  };
+
   if (isLoading) return <p className="text-sm text-muted-foreground">Loading...</p>;
 
   const isFormOpen = editing || creating;
+  const inputClass = "w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold";
 
   return (
     <div>
@@ -93,90 +125,171 @@ const AdminProducts = () => {
       </div>
 
       {isFormOpen && (
-        <div className="mb-6 p-4 bg-secondary/50 border border-border rounded-xl space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 p-4 bg-secondary/50 border border-border rounded-xl space-y-4 max-h-[75vh] overflow-y-auto">
+          <div className="flex items-center justify-between sticky top-0 bg-secondary/80 backdrop-blur-sm py-2 -mx-4 px-4">
             <h3 className="font-heading text-sm font-semibold">{creating ? 'New Product' : 'Edit Product'}</h3>
             <button onClick={() => { setEditing(null); setCreating(false); setForm({}); }} className="p-1 text-muted-foreground hover:text-foreground"><X size={16} /></button>
           </div>
+
+          {/* Basic Fields */}
+          <p className="text-xs font-body font-semibold text-muted-foreground uppercase tracking-wider">Basic Info</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="text-xs font-body font-medium text-foreground">Name *</label>
-              <input value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+              <input value={form.name || ''} onChange={e => setForm({ ...form, name: e.target.value })} className={inputClass} />
             </div>
             <div>
               <label className="text-xs font-body font-medium text-foreground">Slug *</label>
-              <input value={form.slug || ''} onChange={e => setForm({ ...form, slug: e.target.value })} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+              <input value={form.slug || ''} onChange={e => setForm({ ...form, slug: e.target.value })} className={inputClass} />
             </div>
             <div>
               <label className="text-xs font-body font-medium text-foreground">Price *</label>
-              <input type="number" value={form.price || ''} onChange={e => setForm({ ...form, price: +e.target.value })} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+              <input type="number" value={form.price || ''} onChange={e => setForm({ ...form, price: +e.target.value })} className={inputClass} />
             </div>
             <div>
               <label className="text-xs font-body font-medium text-foreground">Original Price</label>
-              <input type="number" value={form.original_price || ''} onChange={e => setForm({ ...form, original_price: e.target.value ? +e.target.value : null })} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+              <input type="number" value={form.original_price || ''} onChange={e => setForm({ ...form, original_price: e.target.value ? +e.target.value : null })} className={inputClass} />
             </div>
             <div>
               <label className="text-xs font-body font-medium text-foreground">Category</label>
-              <select value={form.category || 'bedsheet'} onChange={e => setForm({ ...form, category: e.target.value })} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none">
+              <select value={form.category || 'bedsheet'} onChange={e => setForm({ ...form, category: e.target.value })} className={inputClass}>
                 <option value="bedsheet">Bedsheet</option>
                 <option value="jewelry">Jewelry</option>
               </select>
             </div>
             <div>
               <label className="text-xs font-body font-medium text-foreground">Subcategory</label>
-              <input value={form.subcategory || ''} onChange={e => setForm({ ...form, subcategory: e.target.value })} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+              <input value={form.subcategory || ''} onChange={e => setForm({ ...form, subcategory: e.target.value })} className={inputClass} />
             </div>
             <div>
               <label className="text-xs font-body font-medium text-foreground">Material</label>
-              <input value={form.material || ''} onChange={e => setForm({ ...form, material: e.target.value })} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+              <input value={form.material || ''} onChange={e => setForm({ ...form, material: e.target.value })} className={inputClass} />
             </div>
             <div>
               <label className="text-xs font-body font-medium text-foreground">Units</label>
-              <input type="number" value={form.units || ''} onChange={e => setForm({ ...form, units: +e.target.value })} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+              <input type="number" value={form.units || ''} onChange={e => setForm({ ...form, units: +e.target.value })} className={inputClass} />
             </div>
             <div>
               <label className="text-xs font-body font-medium text-foreground">Rating</label>
-              <input type="number" step="0.1" max="5" value={form.rating || ''} onChange={e => setForm({ ...form, rating: +e.target.value })} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+              <input type="number" step="0.1" max="5" value={form.rating || ''} onChange={e => setForm({ ...form, rating: +e.target.value })} className={inputClass} />
             </div>
             <div>
               <label className="text-xs font-body font-medium text-foreground">Reviews</label>
-              <input type="number" value={form.reviews || ''} onChange={e => setForm({ ...form, reviews: +e.target.value })} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+              <input type="number" value={form.reviews || ''} onChange={e => setForm({ ...form, reviews: +e.target.value })} className={inputClass} />
             </div>
             <div>
               <label className="text-xs font-body font-medium text-foreground">Sort Order</label>
-              <input type="number" value={form.sort_order || 0} onChange={e => setForm({ ...form, sort_order: +e.target.value })} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+              <input type="number" value={form.sort_order || 0} onChange={e => setForm({ ...form, sort_order: +e.target.value })} className={inputClass} />
             </div>
-            <div className="sm:col-span-2 lg:col-span-3">
-              <label className="text-xs font-body font-medium text-foreground">Description</label>
-              <textarea value={form.description || ''} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold resize-none" />
-            </div>
-            <div>
-              <label className="text-xs font-body font-medium text-foreground">Care Instructions</label>
-              <input value={form.care_instructions || ''} onChange={e => setForm({ ...form, care_instructions: e.target.value })} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
-            </div>
+          </div>
+
+          <div>
+            <label className="text-xs font-body font-medium text-foreground">Subtitle (benefit tagline)</label>
+            <input value={form.subtitle || ''} onChange={e => setForm({ ...form, subtitle: e.target.value })} placeholder="e.g. Luxury comfort for every season" className={inputClass} />
+          </div>
+
+          <div>
+            <label className="text-xs font-body font-medium text-foreground">Description</label>
+            <textarea value={form.description || ''} onChange={e => setForm({ ...form, description: e.target.value })} rows={3} className={inputClass + ' resize-none'} />
+          </div>
+          <div>
+            <label className="text-xs font-body font-medium text-foreground">Care Instructions</label>
+            <input value={form.care_instructions || ''} onChange={e => setForm({ ...form, care_instructions: e.target.value })} className={inputClass} />
+          </div>
+
+          {/* Arrays */}
+          <p className="text-xs font-body font-semibold text-muted-foreground uppercase tracking-wider pt-2">Variants & Images</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="text-xs font-body font-medium text-foreground">Sizes (comma-separated)</label>
-              <input value={form.sizes?.join(', ') || ''} onChange={e => handleArrayField('sizes', e.target.value)} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+              <input value={form.sizes?.join(', ') || ''} onChange={e => handleArrayField('sizes', e.target.value)} className={inputClass} />
             </div>
             <div>
               <label className="text-xs font-body font-medium text-foreground">Colors (comma-separated)</label>
-              <input value={form.colors?.join(', ') || ''} onChange={e => handleArrayField('colors', e.target.value)} className="w-full mt-1 bg-background border border-border rounded-lg px-3 py-2 text-sm font-body outline-none focus:ring-1 focus:ring-gold" />
+              <input value={form.colors?.join(', ') || ''} onChange={e => handleArrayField('colors', e.target.value)} className={inputClass} />
             </div>
-            <div className="flex items-center gap-6 sm:col-span-2 lg:col-span-3">
-              <label className="flex items-center gap-2 text-sm font-body">
-                <input type="checkbox" checked={form.featured || false} onChange={e => setForm({ ...form, featured: e.target.checked })} className="accent-primary" /> Featured
-              </label>
-              <label className="flex items-center gap-2 text-sm font-body">
-                <input type="checkbox" checked={form.best_seller || false} onChange={e => setForm({ ...form, best_seller: e.target.checked })} className="accent-primary" /> Best Seller
-              </label>
-              <label className="flex items-center gap-2 text-sm font-body">
-                <input type="checkbox" checked={form.new_arrival || false} onChange={e => setForm({ ...form, new_arrival: e.target.checked })} className="accent-primary" /> New Arrival
-              </label>
-              <label className="flex items-center gap-2 text-sm font-body">
-                <input type="checkbox" checked={form.is_active !== false} onChange={e => setForm({ ...form, is_active: e.target.checked })} className="accent-primary" /> Active
-              </label>
+            <div>
+              <label className="text-xs font-body font-medium text-foreground">Images (comma-separated URLs, up to 6)</label>
+              <input value={form.images?.join(', ') || ''} onChange={e => handleArrayField('images', e.target.value)} className={inputClass} />
             </div>
           </div>
+
+          <div>
+            <label className="text-xs font-body font-medium text-foreground">Customer's Favourite Variant</label>
+            <select value={form.favourite_variant || ''} onChange={e => setForm({ ...form, favourite_variant: e.target.value })} className={inputClass}>
+              <option value="">None</option>
+              {(form.sizes || []).map((s: string) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+
+          {/* Variant Pricing */}
+          {form.sizes?.length > 0 && (
+            <div>
+              <p className="text-xs font-body font-semibold text-muted-foreground uppercase tracking-wider pt-2">Variant Pricing (leave blank to use base price)</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mt-2">
+                {(form.sizes || []).map((size: string) => (
+                  <div key={size}>
+                    <label className="text-xs font-body text-foreground">{size}</label>
+                    <input
+                      type="number"
+                      value={form.variant_prices?.[size] || ''}
+                      onChange={e => handleVariantPriceChange(size, e.target.value)}
+                      placeholder={`₹${form.price}`}
+                      className={inputClass}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Trust Signals */}
+          <div>
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-body font-semibold text-muted-foreground uppercase tracking-wider pt-2">Trust Signals</p>
+              <button onClick={addTrustSignal} className="text-xs font-body text-primary hover:underline">+ Add</button>
+            </div>
+            <div className="space-y-2 mt-2">
+              {(form.trust_signals || []).map((ts: any, idx: number) => (
+                <div key={idx} className="flex gap-2 items-center">
+                  <select value={ts.icon} onChange={e => handleTrustSignalChange(idx, 'icon', e.target.value)} className="bg-background border border-border rounded-lg px-2 py-1.5 text-xs font-body outline-none">
+                    {['Truck', 'RotateCcw', 'Shield', 'Lock', 'CheckCircle', 'Heart'].map(ic => <option key={ic} value={ic}>{ic}</option>)}
+                  </select>
+                  <input value={ts.text} onChange={e => handleTrustSignalChange(idx, 'text', e.target.value)} placeholder="e.g. Free Returns" className="flex-1 bg-background border border-border rounded-lg px-3 py-1.5 text-xs font-body outline-none" />
+                  <button onClick={() => removeTrustSignal(idx)} className="text-muted-foreground hover:text-destructive"><X size={14} /></button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Benefit Points */}
+          <div>
+            <label className="text-xs font-body font-medium text-foreground">Why You'll Love It — Benefit Points (one per line)</label>
+            <textarea
+              value={(form.benefit_points || []).join('\n')}
+              onChange={e => setForm({ ...form, benefit_points: e.target.value.split('\n').filter(Boolean) })}
+              rows={4}
+              placeholder="Premium 400TC cotton&#10;OEKO-TEX certified safe&#10;Wrinkle-resistant finish&#10;Fits mattresses up to 15 inches"
+              className={inputClass + ' resize-none'}
+            />
+          </div>
+
+          {/* Toggles */}
+          <div className="flex items-center gap-6">
+            <label className="flex items-center gap-2 text-sm font-body">
+              <input type="checkbox" checked={form.featured || false} onChange={e => setForm({ ...form, featured: e.target.checked })} className="accent-primary" /> Featured
+            </label>
+            <label className="flex items-center gap-2 text-sm font-body">
+              <input type="checkbox" checked={form.best_seller || false} onChange={e => setForm({ ...form, best_seller: e.target.checked })} className="accent-primary" /> Best Seller
+            </label>
+            <label className="flex items-center gap-2 text-sm font-body">
+              <input type="checkbox" checked={form.new_arrival || false} onChange={e => setForm({ ...form, new_arrival: e.target.checked })} className="accent-primary" /> New Arrival
+            </label>
+            <label className="flex items-center gap-2 text-sm font-body">
+              <input type="checkbox" checked={form.is_active !== false} onChange={e => setForm({ ...form, is_active: e.target.checked })} className="accent-primary" /> Active
+            </label>
+          </div>
+
           <div className="flex gap-2 pt-2">
             <button onClick={handleSave} disabled={saveMutation.isPending} className="flex items-center gap-2 text-sm font-body bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-maroon-light transition-colors disabled:opacity-50">
               <Save size={14} /> {saveMutation.isPending ? 'Saving...' : 'Save'}
