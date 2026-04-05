@@ -311,22 +311,52 @@ const ProductDetail = () => {
         </motion.button>
       </div>
 
-      {/* Mobile Lightbox */}
+      {/* Mobile Lightbox with swipe */}
       <AnimatePresence>
         {lightboxOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-foreground/95 flex items-center justify-center"
+            className="fixed inset-0 z-50 bg-foreground/95 flex flex-col items-center justify-center"
             onClick={() => setLightboxOpen(false)}
           >
-            <button className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-background/20 flex items-center justify-center text-background" onClick={() => setLightboxOpen(false)}>
+            <button className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-background/20 flex items-center justify-center text-background" onClick={(e) => { e.stopPropagation(); setLightboxOpen(false); }}>
               <X size={20} />
             </button>
-            <div className="w-full h-full flex items-center justify-center p-4 touch-pinch-zoom" style={{ touchAction: 'pinch-zoom' }}>
-              <img src={mainImg} alt={product.name} className="max-w-full max-h-full object-contain" />
+            {images.length > 1 && (
+              <>
+                <button className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background/20 flex items-center justify-center text-background" onClick={(e) => { e.stopPropagation(); setActiveImageIdx((activeImageIdx - 1 + images.length) % images.length); }}>
+                  <ArrowLeft size={18} />
+                </button>
+                <button className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background/20 flex items-center justify-center text-background rotate-180" onClick={(e) => { e.stopPropagation(); setActiveImageIdx((activeImageIdx + 1) % images.length); }}>
+                  <ArrowLeft size={18} />
+                </button>
+              </>
+            )}
+            <div
+              className="w-full h-full flex items-center justify-center p-4 touch-pinch-zoom"
+              style={{ touchAction: 'pinch-zoom' }}
+              onClick={(e) => e.stopPropagation()}
+              onTouchStart={(e) => { (e.currentTarget as any)._touchX = e.touches[0].clientX; }}
+              onTouchEnd={(e) => {
+                const startX = (e.currentTarget as any)._touchX;
+                if (startX == null) return;
+                const diff = (e.changedTouches[0]?.clientX || 0) - startX;
+                if (Math.abs(diff) > 50) {
+                  setActiveImageIdx(diff > 0 ? (activeImageIdx - 1 + images.length) % images.length : (activeImageIdx + 1) % images.length);
+                }
+              }}
+            >
+              <img src={images[activeImageIdx] || images[0]} alt={product.name} className="max-w-full max-h-full object-contain" />
             </div>
+            {images.length > 1 && (
+              <div className="absolute bottom-6 flex gap-1.5">
+                {images.map((_, i) => (
+                  <button key={i} onClick={(e) => { e.stopPropagation(); setActiveImageIdx(i); }} className={`w-2 h-2 rounded-full transition-colors ${i === activeImageIdx ? 'bg-gold' : 'bg-background/40'}`} />
+                ))}
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

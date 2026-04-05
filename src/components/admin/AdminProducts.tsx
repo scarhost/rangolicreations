@@ -199,7 +199,7 @@ const AdminProducts = () => {
 
           {/* Arrays */}
           <p className="text-xs font-body font-semibold text-muted-foreground uppercase tracking-wider pt-2">Variants & Images</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-body font-medium text-foreground">Sizes (comma-separated)</label>
               <input value={form.sizes?.join(', ') || ''} onChange={e => handleArrayField('sizes', e.target.value)} className={inputClass} />
@@ -208,10 +208,85 @@ const AdminProducts = () => {
               <label className="text-xs font-body font-medium text-foreground">Colors (comma-separated)</label>
               <input value={form.colors?.join(', ') || ''} onChange={e => handleArrayField('colors', e.target.value)} className={inputClass} />
             </div>
-            <div>
-              <label className="text-xs font-body font-medium text-foreground">Images (comma-separated URLs, up to 6)</label>
-              <input value={form.images?.join(', ') || ''} onChange={e => handleArrayField('images', e.target.value)} className={inputClass} />
+          </div>
+
+          {/* Image Manager */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-body font-medium text-foreground">Product Images (up to 6)</label>
+              <button
+                onClick={() => {
+                  const imgs = [...(form.images || [])].filter(i => i && i !== '/placeholder.svg');
+                  if (imgs.length >= 6) { alert('Maximum 6 images allowed'); return; }
+                  const url = prompt('Enter image URL:');
+                  if (url?.trim()) {
+                    setForm({ ...form, images: [...imgs, url.trim()] });
+                  }
+                }}
+                className="text-xs font-body text-primary hover:underline"
+              >+ Add Image</button>
             </div>
+            <div className="flex gap-2 flex-wrap">
+              {(form.images || []).filter((img: string) => img && img !== '/placeholder.svg').map((img: string, idx: number) => {
+                const imgs = (form.images || []).filter((i: string) => i && i !== '/placeholder.svg');
+                return (
+                  <div key={idx} className={`relative group w-20 h-20 rounded-lg overflow-hidden border-2 ${idx === 0 ? 'border-gold' : 'border-border'}`}>
+                    <img src={img} alt={`Image ${idx + 1}`} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                      {idx > 0 && (
+                        <button
+                          onClick={() => {
+                            const newImgs = [...imgs];
+                            [newImgs[idx - 1], newImgs[idx]] = [newImgs[idx], newImgs[idx - 1]];
+                            setForm({ ...form, images: newImgs });
+                          }}
+                          className="w-6 h-6 rounded bg-background/80 flex items-center justify-center text-foreground text-[10px]"
+                          title="Move left"
+                        >←</button>
+                      )}
+                      {idx === 0 ? (
+                        <span className="text-[8px] text-gold font-body font-bold">PRIMARY</span>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            const newImgs = [...imgs];
+                            const [item] = newImgs.splice(idx, 1);
+                            newImgs.unshift(item);
+                            setForm({ ...form, images: newImgs });
+                          }}
+                          className="w-6 h-6 rounded bg-gold/80 flex items-center justify-center text-accent-foreground text-[10px]"
+                          title="Set as primary"
+                        >★</button>
+                      )}
+                      {idx < imgs.length - 1 && (
+                        <button
+                          onClick={() => {
+                            const newImgs = [...imgs];
+                            [newImgs[idx], newImgs[idx + 1]] = [newImgs[idx + 1], newImgs[idx]];
+                            setForm({ ...form, images: newImgs });
+                          }}
+                          className="w-6 h-6 rounded bg-background/80 flex items-center justify-center text-foreground text-[10px]"
+                          title="Move right"
+                        >→</button>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => {
+                        const newImgs = imgs.filter((_: string, i: number) => i !== idx);
+                        setForm({ ...form, images: newImgs.length > 0 ? newImgs : ['/placeholder.svg'] });
+                      }}
+                      className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X size={10} />
+                    </button>
+                  </div>
+                );
+              })}
+              {((form.images || []).filter((i: string) => i && i !== '/placeholder.svg').length === 0) && (
+                <p className="text-xs text-muted-foreground font-body py-2">No images added yet.</p>
+              )}
+            </div>
+            <p className="text-[10px] text-muted-foreground font-body mt-1">First image (gold border) is the primary. Hover to reorder, set primary (★), or delete.</p>
           </div>
 
           <div>
