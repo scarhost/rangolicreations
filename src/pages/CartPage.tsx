@@ -2,14 +2,11 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Minus, Plus, X, ArrowLeft, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
-import { useCurrency } from '@/context/CurrencyContext';
-
 import bedsheetImg from '@/assets/product-bedsheet-1.jpg';
 import jewelryImg from '@/assets/product-jewelry-1.jpg';
 
 const CartPage = () => {
   const { items, removeFromCart, updateQuantity, totalPrice } = useCart();
-  const { formatPrice, convertPrice, flatShippingFee, currencySymbol, currencyCode } = useCurrency();
 
   if (items.length === 0) {
     return (
@@ -26,8 +23,7 @@ const CartPage = () => {
     );
   }
 
-  const convertedTotal = convertPrice(totalPrice);
-  const shipping = flatShippingFee;
+  const shipping = totalPrice >= 2999 ? 0 : 199;
 
   return (
     <div className="min-h-screen">
@@ -73,7 +69,7 @@ const CartPage = () => {
                         <Plus size={12} />
                       </button>
                     </div>
-                    <span className="font-heading text-sm font-semibold">{formatPrice(item.product.price * item.quantity)}</span>
+                    <span className="font-heading text-sm font-semibold">₹{(item.product.price * item.quantity).toLocaleString()}</span>
                   </div>
                 </div>
               </motion.div>
@@ -86,15 +82,15 @@ const CartPage = () => {
             <div className="space-y-3 text-sm font-body">
               <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal</span>
-                <span>{formatPrice(totalPrice)}</span>
+                <span>₹{totalPrice.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>Shipping</span>
-                <span>{shipping === 0 ? 'FREE' : `${currencySymbol}${shipping}`}</span>
+                <span>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
               </div>
               <div className="border-t border-border pt-3 flex justify-between text-foreground font-medium">
                 <span>Total</span>
-                <span className="font-heading text-lg">{currencySymbol}{(convertedTotal + shipping).toLocaleString(undefined, { minimumFractionDigits: currencyCode === 'JPY' ? 0 : 2, maximumFractionDigits: 2 })}</span>
+                <span className="font-heading text-lg">₹{(totalPrice + shipping).toLocaleString()}</span>
               </div>
             </div>
             <Link
@@ -103,9 +99,9 @@ const CartPage = () => {
             >
               Proceed to Checkout
             </Link>
-            {shipping > 0 && (
+            {totalPrice < 2999 && (
               <p className="text-[10px] text-muted-foreground font-body mt-3 text-center">
-                Shipping to your region: {currencySymbol}{shipping}
+                Add ₹{(2999 - totalPrice).toLocaleString()} more for free shipping
               </p>
             )}
           </div>

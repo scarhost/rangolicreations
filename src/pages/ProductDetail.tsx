@@ -4,8 +4,6 @@ import { motion } from 'framer-motion';
 import { ShoppingBag, Minus, Plus, Star, Truck, RotateCcw, Shield, ArrowLeft } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/context/CartContext';
-import { useCurrency } from '@/context/CurrencyContext';
-
 import ProductCard from '@/components/ProductCard';
 import RangoliSpinner from '@/components/RangoliSpinner';
 import bedsheetImg from '@/assets/product-bedsheet-1.jpg';
@@ -17,7 +15,6 @@ import { useQuery } from '@tanstack/react-query';
 const ProductDetail = () => {
   const { id: slug } = useParams<{ id: string }>();
   const { addToCart } = useCart();
-  const { formatPrice, flatShippingFee, currencySymbol, regionName } = useCurrency();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ['product-slug', slug],
@@ -99,10 +96,10 @@ const ProductDetail = () => {
             </div>
 
             <div className="flex items-baseline gap-3 mb-6">
-              <span className="font-heading text-3xl font-semibold text-foreground">{formatPrice(product.price)}</span>
+              <span className="font-heading text-3xl font-semibold text-foreground">₹{product.price.toLocaleString()}</span>
               {product.original_price && (
                 <>
-                  <span className="text-lg text-muted-foreground line-through font-body">{formatPrice(product.original_price)}</span>
+                  <span className="text-lg text-muted-foreground line-through font-body">₹{product.original_price.toLocaleString()}</span>
                   <span className="text-sm text-primary font-body font-medium">-{discount}% OFF</span>
                 </>
               )}
@@ -164,7 +161,7 @@ const ProductDetail = () => {
               )}
               <div className="flex items-start gap-3">
                 <Truck size={16} className="text-gold-dark mt-0.5 shrink-0" />
-                <div><p className="text-xs font-body font-medium text-foreground">Delivery to {regionName}</p><p className="text-xs text-muted-foreground font-body">{flatShippingFee === 0 ? 'Free shipping' : `Shipping: ${currencySymbol}${flatShippingFee}`}. Estimated 5-7 business days.</p></div>
+                <div><p className="text-xs font-body font-medium text-foreground">Delivery</p><p className="text-xs text-muted-foreground font-body">Free shipping on orders above ₹2,999. Estimated 5-7 business days.</p></div>
               </div>
             </div>
           </motion.div>
