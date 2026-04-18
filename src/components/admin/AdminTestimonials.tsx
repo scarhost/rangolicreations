@@ -21,7 +21,7 @@ const AdminTestimonials = () => {
   const saveMutation = useMutation({
     mutationFn: async (item: Record<string, any>) => {
       if (item.id) {
-        const { error } = await supabase.from('testimonials').update(item).eq('id', item.id);
+        const { error } = await supabase.from('testimonials').update(item as any).eq('id', item.id);
         if (error) throw error;
       } else {
         const { error } = await supabase.from('testimonials').insert([{ name: item.name, location: item.location, text: item.text, rating: item.rating, is_active: item.is_active, sort_order: item.sort_order }]);
