@@ -32,7 +32,7 @@ const AdminProducts = () => {
   const saveMutation = useMutation({
     mutationFn: async (product: Record<string, any>) => {
       if (product.id) {
-        const { error } = await supabase.from('products').update(product).eq('id', product.id);
+        const { error } = await supabase.from('products').update(product as any).eq('id', product.id);
         if (error) throw error;
       } else {
         const { error } = await supabase.from('products').insert(product as TablesInsert<'products'>);
