@@ -4,8 +4,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Minus, Plus, Star, Truck, RotateCcw, Shield, ArrowLeft, Award, CheckCircle, Lock, Heart, X } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 import ProductCard from '@/components/ProductCard';
 import RangoliSpinner from '@/components/RangoliSpinner';
+import RecentlyViewed from '@/components/RecentlyViewed';
+import SEO from '@/components/SEO';
 import bedsheetImg from '@/assets/product-bedsheet-1.jpg';
 import jewelryImg from '@/assets/product-jewelry-1.jpg';
 import type { Product } from '@/hooks/useProducts';
@@ -15,6 +19,8 @@ import { useQuery } from '@tanstack/react-query';
 const ProductDetail = () => {
   const { id: slug } = useParams<{ id: string }>();
   const { addToCart } = useCart();
+  const { isInWishlist, toggle } = useWishlist();
+  const { add: addRecent } = useRecentlyViewed();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ['product-slug', slug],
@@ -45,8 +51,9 @@ const ProductDetail = () => {
       if (product.sizes?.length) setSelectedSize(product.sizes[0]);
       if (product.colors?.length) setSelectedColor(product.colors[0]);
       setActiveImageIdx(0);
+      addRecent(product.id);
     }
-  }, [product]);
+  }, [product, addRecent]);
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><RangoliSpinner /></div>;
 
@@ -101,8 +108,37 @@ const ProductDetail = () => {
   ];
   const displayTrustSignals = trustSignals.length > 0 ? trustSignals : defaultTrustSignals;
 
+  const wished = isInWishlist(product.id);
+
+  const productJsonLd = {
+    '@context': 'https://schema.org/',
+    '@type': 'Product',
+    name: product.name,
+    description: product.description || subtitle || '',
+    image: mainImg,
+    sku: product.id,
+    brand: { '@type': 'Brand', name: 'Rangoli Creations' },
+    aggregateRating: product.rating
+      ? { '@type': 'AggregateRating', ratingValue: product.rating, reviewCount: product.reviews || 1 }
+      : undefined,
+    offers: {
+      '@type': 'Offer',
+      url: typeof window !== 'undefined' ? window.location.href : '',
+      priceCurrency: 'INR',
+      price: currentPrice,
+      availability: (product.units ?? 0) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    },
+  };
+
   return (
     <div className="min-h-screen pb-20 lg:pb-0">
+      <SEO
+        title={product.name}
+        description={subtitle || product.description?.slice(0, 155) || `Shop ${product.name} at Rangoli Creations.`}
+        image={mainImg}
+        type="product"
+        jsonLd={productJsonLd}
+      />
       <div className="container mx-auto px-4 lg:px-8 py-6">
         <Link to={product.category === 'bedsheet' ? '/bedsheets' : '/jewelry'} className="inline-flex items-center gap-2 text-xs text-muted-foreground font-body mb-6 hover:text-primary transition-colors">
           <ArrowLeft size={14} /> Back to {product.category === 'bedsheet' ? 'Bedsheets' : 'Jewelry'}
@@ -155,7 +191,16 @@ const ProductDetail = () => {
             {product.new_arrival && (
               <span className="inline-block bg-gold text-accent-foreground text-[10px] font-body font-medium px-2.5 py-1 rounded-full mb-3">NEW ARRIVAL</span>
             )}
-            <h1 className="font-heading text-2xl lg:text-3xl font-semibold text-foreground mb-1">{product.name}</h1>
+            <div className="flex items-start justify-between gap-3">
+              <h1 className="font-heading text-2xl lg:text-3xl font-semibold text-foreground mb-1">{product.name}</h1>
+              <button
+                onClick={() => toggle(product.id, product.name)}
+                aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}
+                className="shrink-0 w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-secondary transition-colors"
+              >
+                <Heart size={18} className={wished ? 'text-primary fill-primary' : 'text-muted-foreground'} />
+              </button>
+            </div>
 
             {subtitle && (
               <p className="text-sm text-primary font-body font-medium mb-3">{subtitle}</p>
@@ -295,6 +340,8 @@ const ProductDetail = () => {
           </section>
         )}
       </div>
+
+      <RecentlyViewed excludeId={product.id} />
 
       {/* Sticky Mobile Add to Cart */}
       <div className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-md border-t border-border p-4 flex items-center gap-3 lg:hidden z-40">

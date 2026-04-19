@@ -5,7 +5,8 @@ import { SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/hooks/useProducts';
 import { useSiteContent } from '@/hooks/useSiteContent';
-import RangoliSpinner from '@/components/RangoliSpinner';
+import SEO from '@/components/SEO';
+import { ProductGridSkeleton } from '@/components/ProductSkeleton';
 
 const sizes = ['Single', 'Double', 'King', 'Super King'];
 const materials = ['cotton', 'silk-blend', 'linen', 'sateen', 'organic'];
@@ -56,10 +57,14 @@ const BedsheetsShop = () => {
     setSort('featured');
   };
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center"><RangoliSpinner /></div>;
+  // loading shown inline below
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Premium Bedsheets Collection"
+        description="Shop handcrafted premium cotton, silk-blend & sateen bedsheets. Free shipping above ₹2,999."
+      />
       <div className="bg-gradient-to-r from-secondary via-background to-blush/30 py-12 lg:py-16">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <span className="text-xs font-body tracking-[0.3em] text-gold-dark uppercase">{c('header', 'eyebrow', 'Our Collection')}</span>
@@ -118,11 +123,15 @@ const BedsheetsShop = () => {
 
         <p className="text-xs text-muted-foreground font-body mb-6">{filtered.length} products</p>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-          {filtered.map((product, i) => <ProductCard key={product.id} product={product} index={i} />)}
-        </div>
+        {isLoading ? (
+          <ProductGridSkeleton count={8} />
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+            {filtered.map((product, i) => <ProductCard key={product.id} product={product} index={i} />)}
+          </div>
+        )}
 
-        {filtered.length === 0 && (
+        {!isLoading && filtered.length === 0 && (
           <div className="text-center py-20">
             <p className="text-muted-foreground font-body">No products match your filters.</p>
             <button onClick={clearFilters} className="text-sm text-primary font-body mt-2">Clear filters</button>
