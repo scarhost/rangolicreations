@@ -8,7 +8,7 @@ const RangoliTransition = () => {
 
   useEffect(() => {
     setIsTransitioning(true);
-    const timer = setTimeout(() => setIsTransitioning(false), 800);
+    const timer = setTimeout(() => setIsTransitioning(false), 450);
     return () => clearTimeout(timer);
   }, [location.pathname]);
 
@@ -22,13 +22,13 @@ const RangoliTransition = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {/* Background overlay */}
+          {/* Background overlay - subtle, non-blocking */}
           <motion.div
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-background/20"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.15 }}
           />
 
           {/* Rangoli pattern - expanding circles */}
