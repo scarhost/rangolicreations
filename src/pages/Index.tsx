@@ -7,6 +7,8 @@ import { useProducts } from '@/hooks/useProducts';
 import { useTestimonials } from '@/hooks/useTestimonials';
 import { useSiteContent } from '@/hooks/useSiteContent';
 import RangoliSpinner from '@/components/RangoliSpinner';
+import SEO from '@/components/SEO';
+import { ProductGridSkeleton } from '@/components/ProductSkeleton';
 
 const iconMap: Record<string, React.ElementType> = { Heart, Truck, Shield, Repeat };
 

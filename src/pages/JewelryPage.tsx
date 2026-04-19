@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/hooks/useProducts';
 import { useSiteContent } from '@/hooks/useSiteContent';
-import RangoliSpinner from '@/components/RangoliSpinner';
+import SEO from '@/components/SEO';
+import { ProductGridSkeleton } from '@/components/ProductSkeleton';
 
 const JewelryPage = () => {
   const { data: jewelry, isLoading } = useProducts('jewelry');
@@ -12,13 +13,12 @@ const JewelryPage = () => {
 
   const c = (section: string, field: string, fallback: string) => content?.[section]?.[field] ?? fallback;
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center"><RangoliSpinner /></div>;
-
   const categories = [...new Set(jewelry?.map(p => p.subcategory).filter(Boolean) || [])];
   const filtered = activeCategory ? jewelry?.filter(p => p.subcategory === activeCategory) : jewelry;
 
   return (
     <div className="min-h-screen">
+      <SEO title="Artisanal Jewelry Collection" description="Handcrafted Indian jewelry — earrings, necklaces, and more at Rangoli Creations." />
       <div className="bg-gradient-to-r from-blush/50 via-background to-gold/5 py-12 lg:py-16">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <span className="text-xs font-body tracking-[0.3em] text-gold-dark uppercase">{c('header', 'eyebrow', 'Adorn Yourself')}</span>
@@ -35,9 +35,13 @@ const JewelryPage = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
-          {filtered?.map((product, i) => <ProductCard key={product.id} product={product} index={i} />)}
-        </div>
+        {isLoading ? (
+          <ProductGridSkeleton count={6} />
+        ) : (
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+            {filtered?.map((product, i) => <ProductCard key={product.id} product={product} index={i} />)}
+          </div>
+        )}
       </div>
     </div>
   );

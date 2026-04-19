@@ -5,7 +5,8 @@ import { SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { useProducts } from '@/hooks/useProducts';
 import { useSiteContent } from '@/hooks/useSiteContent';
-import RangoliSpinner from '@/components/RangoliSpinner';
+import SEO from '@/components/SEO';
+import { ProductGridSkeleton } from '@/components/ProductSkeleton';
 
 const sizes = ['Single', 'Double', 'King', 'Super King'];
 const materials = ['cotton', 'silk-blend', 'linen', 'sateen', 'organic'];
