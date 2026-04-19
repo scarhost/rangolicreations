@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { toast } from 'sonner';
 import { CartContext, type CartItem } from './cart-context-core';
 
 export { useCart } from './cart-context-core';
@@ -37,6 +38,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         );
       }
       return [...prev, { product, quantity, selectedSize: size, selectedColor: color }];
+    });
+    toast.success(`Added "${product.name}" to cart`, {
+      description: size ? `Size: ${size}` : undefined,
     });
   }, []);
 

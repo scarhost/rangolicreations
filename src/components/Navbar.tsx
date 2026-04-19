@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingBag, Search, User, Menu, X } from 'lucide-react';
+import { ShoppingBag, Search, User, Menu, X, Heart } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGlobalContent } from '@/hooks/useSiteContent';
+import SearchCommand from '@/components/SearchCommand';
 
 const navLinks = [
   { label: 'Home', path: '/' },
@@ -17,6 +19,7 @@ const navLinks = [
 
 const Navbar = () => {
   const { totalItems } = useCart();
+  const { count: wishCount } = useWishlist();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -32,7 +35,7 @@ const Navbar = () => {
 
       <nav className="container mx-auto px-4 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
-          <button className="lg:hidden p-2 text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
+          <button className="lg:hidden p-2 text-foreground" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Menu">
             {mobileOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
@@ -51,29 +54,27 @@ const Navbar = () => {
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
-            <button onClick={() => setSearchOpen(!searchOpen)} className="p-2 text-foreground hover:text-primary transition-colors"><Search size={18} /></button>
-            <Link to="/cart" className="relative p-2 text-foreground hover:text-primary transition-colors">
-              <ShoppingBag size={18} />
-              {totalItems > 0 && (
-                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 bg-primary text-primary-foreground text-[10px] rounded-full flex items-center justify-center font-medium">{totalItems}</motion.span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <button onClick={() => setSearchOpen(true)} className="p-2 text-foreground hover:text-primary transition-colors" aria-label="Search">
+              <Search size={18} />
+            </button>
+            <Link to="/wishlist" className="relative p-2 text-foreground hover:text-primary transition-colors" aria-label="Wishlist">
+              <Heart size={18} />
+              {wishCount > 0 && (
+                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-primary text-primary-foreground text-[10px] rounded-full flex items-center justify-center font-medium">{wishCount}</motion.span>
               )}
             </Link>
-            <Link to="/admin" className="p-2 text-foreground hover:text-primary transition-colors hidden sm:block">
+            <Link to="/cart" className="relative p-2 text-foreground hover:text-primary transition-colors" aria-label="Cart">
+              <ShoppingBag size={18} />
+              {totalItems > 0 && (
+                <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-primary text-primary-foreground text-[10px] rounded-full flex items-center justify-center font-medium">{totalItems}</motion.span>
+              )}
+            </Link>
+            <Link to="/admin" className="p-2 text-foreground hover:text-primary transition-colors hidden sm:block" aria-label="Admin">
               <User size={18} />
             </Link>
           </div>
         </div>
-
-        <AnimatePresence>
-          {searchOpen && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden border-t border-border">
-              <div className="py-3">
-                <input type="text" placeholder="Search bedsheets, jewelry..." className="w-full bg-secondary/50 rounded-lg px-4 py-2.5 text-sm font-body outline-none focus:ring-1 focus:ring-gold placeholder:text-muted-foreground" autoFocus />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </nav>
 
       <AnimatePresence>
@@ -83,11 +84,14 @@ const Navbar = () => {
               {navLinks.map(link => (
                 <Link key={link.path} to={link.path} onClick={() => setMobileOpen(false)} className={`text-sm font-body py-2 border-b border-border/50 ${location.pathname === link.path ? 'text-primary font-medium' : 'text-foreground'}`}>{link.label}</Link>
               ))}
+              <Link to="/wishlist" onClick={() => setMobileOpen(false)} className="text-sm font-body py-2 text-foreground">Wishlist ({wishCount})</Link>
               <Link to="/admin" onClick={() => setMobileOpen(false)} className="text-sm font-body py-2 text-foreground">Admin Panel</Link>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <SearchCommand open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 };

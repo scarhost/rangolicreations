@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Eye, Star } from 'lucide-react';
+import { ShoppingBag, Eye, Star, Heart } from 'lucide-react';
 import { motion } from 'framer-motion';
 import type { Product } from '@/hooks/useProducts';
 import { useCart } from '@/context/CartContext';
+import { useWishlist } from '@/context/WishlistContext';
 import QuickViewModal from '@/components/QuickViewModal';
 import bedsheetImg from '@/assets/product-bedsheet-1.jpg';
 import jewelryImg from '@/assets/product-jewelry-1.jpg';
 
 const ProductCard = ({ product, index = 0 }: { product: Product; index?: number }) => {
   const { addToCart } = useCart();
+  const { isInWishlist, toggle } = useWishlist();
   const [isHovered, setIsHovered] = useState(false);
   const [quickView, setQuickView] = useState(false);
+
+  const wished = isInWishlist(product.id);
 
   const discount = product.original_price
     ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
@@ -46,6 +50,17 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
             )}
           </div>
 
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              toggle(product.id, product.name);
+            }}
+            aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center hover:scale-110 transition-transform"
+          >
+            <Heart size={15} className={wished ? 'text-primary fill-primary' : 'text-muted-foreground'} />
+          </button>
+
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: isHovered ? 1 : 0 }}
@@ -66,6 +81,7 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
                 e.preventDefault();
                 setQuickView(true);
               }}
+              aria-label="Quick view"
               className="bg-background/90 backdrop-blur-sm text-foreground p-2.5 rounded-lg hover:bg-background transition-colors"
             >
               <Eye size={14} />
@@ -105,7 +121,9 @@ const ProductCard = ({ product, index = 0 }: { product: Product; index?: number 
             </div>
           )}
 
-          <p className="text-[10px] text-muted-foreground font-body mt-2">{product.units || 0} units available</p>
+          {(product.units ?? 0) > 0 && (product.units ?? 0) <= 5 && (
+            <p className="text-[10px] text-primary font-body font-medium mt-2">Only {product.units} left!</p>
+          )}
         </div>
       </motion.div>
 
