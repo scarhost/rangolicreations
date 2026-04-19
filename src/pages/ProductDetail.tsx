@@ -19,6 +19,8 @@ import { useQuery } from '@tanstack/react-query';
 const ProductDetail = () => {
   const { id: slug } = useParams<{ id: string }>();
   const { addToCart } = useCart();
+  const { isInWishlist, toggle } = useWishlist();
+  const { add: addRecent } = useRecentlyViewed();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ['product-slug', slug],
@@ -49,8 +51,9 @@ const ProductDetail = () => {
       if (product.sizes?.length) setSelectedSize(product.sizes[0]);
       if (product.colors?.length) setSelectedColor(product.colors[0]);
       setActiveImageIdx(0);
+      addRecent(product.id);
     }
-  }, [product]);
+  }, [product, addRecent]);
 
   if (isLoading) return <div className="min-h-screen flex items-center justify-center"><RangoliSpinner /></div>;
 
