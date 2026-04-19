@@ -26,9 +26,7 @@ const Index = () => {
   const c = (section: string, field: string, fallback: string) =>
     content?.[section]?.[field] ?? fallback;
 
-  if (loadingBedsheets || loadingJewelry) {
-    return <div className="min-h-screen flex items-center justify-center"><RangoliSpinner /></div>;
-  }
+  const isLoading = loadingBedsheets || loadingJewelry;
 
   const featured = bedsheets?.filter(p => p.featured).slice(0, 4) || [];
   const bestSellers = bedsheets?.filter(p => p.best_seller).slice(0, 4) || [];
@@ -52,6 +50,16 @@ const Index = () => {
 
   return (
     <div>
+      <SEO
+        title="Rangoli Creations — Premium Bedsheets & Artisanal Jewelry"
+        description="Discover handcrafted luxury bedsheets and artisanal Indian jewelry at Rangoli Creations. Free shipping on orders above ₹2,999."
+        jsonLd={{
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          name: 'Rangoli Creations',
+          url: typeof window !== 'undefined' ? window.location.origin : '',
+        }}
+      />
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
@@ -86,16 +94,20 @@ const Index = () => {
       </section>
 
       {/* Featured Bedsheets */}
-      {featured.length > 0 && (
+      {(featured.length > 0 || isLoading) && (
         <section className="py-16 lg:py-24">
           <div className="container mx-auto px-4 lg:px-8">
             <motion.div {...fadeUp} className="text-center mb-12">
               <span className="text-xs font-body tracking-[0.3em] text-gold-dark uppercase">{c('featured', 'eyebrow', 'Curated for You')}</span>
               <h2 className="font-heading text-3xl lg:text-4xl font-semibold text-foreground mt-2">{c('featured', 'title', 'Featured Bedsheets')}</h2>
             </motion.div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-              {featured.map((product, i) => <ProductCard key={product.id} product={product} index={i} />)}
-            </div>
+            {isLoading ? (
+              <ProductGridSkeleton count={4} />
+            ) : (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                {featured.map((product, i) => <ProductCard key={product.id} product={product} index={i} />)}
+              </div>
+            )}
             <div className="text-center mt-10">
               <Link to="/bedsheets" className="inline-flex items-center gap-2 text-sm font-body text-primary hover:text-maroon-light transition-colors">View All Bedsheets <ArrowRight size={14} /></Link>
             </div>
