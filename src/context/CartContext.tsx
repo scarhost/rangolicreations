@@ -1,28 +1,10 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
-import type { Product } from '@/hooks/useProducts';
+import React, { useState, useCallback, useEffect } from 'react';
+import { CartContext, type CartItem } from './cart-context-core';
+
+export { useCart } from './cart-context-core';
+export type { CartItem } from './cart-context-core';
 
 const CART_STORAGE_KEY = 'rangoli_cart_v1';
-
-export interface CartItem {
-  product: Product;
-  quantity: number;
-  selectedSize?: string;
-  selectedColor?: string;
-}
-
-interface CartContextType {
-  items: CartItem[];
-  addToCart: (product: Product, quantity?: number, size?: string, color?: string) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  clearCart: () => void;
-  totalItems: number;
-  totalPrice: number;
-  isCartOpen: boolean;
-  setIsCartOpen: (open: boolean) => void;
-}
-
-const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>(() => {
@@ -44,7 +26,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [items]);
 
-  const addToCart = useCallback((product: Product, quantity = 1, size?: string, color?: string) => {
+  const addToCart = useCallback((product: Parameters<NonNullable<React.ContextType<typeof CartContext>>['addToCart']>[0], quantity = 1, size?: string, color?: string) => {
     setItems(prev => {
       const existing = prev.find(i => i.product.id === product.id && i.selectedSize === size);
       if (existing) {
@@ -80,10 +62,4 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </CartContext.Provider>
   );
-};
-
-export const useCart = () => {
-  const ctx = useContext(CartContext);
-  if (!ctx) throw new Error('useCart must be used within CartProvider');
-  return ctx;
 };
